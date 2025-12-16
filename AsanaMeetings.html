@@ -7,7 +7,6 @@
 
   <style>
     :root{
-      /* Dark, client-friendly */
       --bg: #0b1020;
       --surface: rgba(15,23,48,.85);
       --surface-2: rgba(17,28,58,.55);
@@ -27,13 +26,11 @@
       --bws:#00A8E8;
       --sg:#2ED47A;
       --ret:#FF4D6D;
-      --sz:#7C5CFF;  /* new */
+      --sz:#7C5CFF;
       --dho:#B56CFF;
 
-      /* Participation dots */
-      --dot: rgba(234,240,255,.92);
-      --dot-border: rgba(255,255,255,.22);
-      --dot-partial: #7C5CFF; /* partial participation accent */
+      --danger:#ff4d6d;
+      --focus: rgba(124,92,255,.35);
     }
 
     *{box-sizing:border-box}
@@ -89,7 +86,6 @@
       margin:16px 0;
     }
 
-    /* Tables */
     table{
       width:100%;
       border-collapse:separate;
@@ -139,12 +135,13 @@
       flex-direction:column;
       gap:8px;
       padding:2px;
+      min-height:92px;
     }
 
     /* Pills */
     .pill{
       display:flex;
-      align-items:center;
+      align-items:flex-start;
       gap:8px;
       padding:7px 10px;
       border-radius:12px;
@@ -152,10 +149,13 @@
       background: var(--pill-bg);
       max-width:100%;
       min-width:0;
+      cursor:grab;
+      user-select:none;
       transition: transform .12s ease, border-color .12s ease, background .12s ease;
+      position:relative;
     }
+    .pill:active{cursor:grabbing;}
 
-    /* Critical: inside calendar cells, pills MUST fill the cell width */
     .slot .pill{
       width:100%;
       max-width:100%;
@@ -179,6 +179,7 @@
       letter-spacing:.6px;
       font-size:12px;
       flex:0 0 auto;
+      line-height:1;
     }
 
     /* Two-line clamp */
@@ -195,6 +196,7 @@
       -webkit-line-clamp:2;
       white-space:normal;
       line-height:1.15;
+      padding-right:18px; /* space for remove button */
     }
 
     /* Colors */
@@ -221,8 +223,9 @@
       gap:10px;
       padding-left:12px;
     }
-
     .legend-grid .pill{width:100%;}
+    .legend-grid .slot{min-height:auto;}
+    .legend-grid .pill{cursor:grab;}
 
     /* Description table */
     .desc-table col:nth-child(1){width:34%;}
@@ -241,9 +244,7 @@
       text-align:center;
       white-space:nowrap;
     }
-    .matrix-table tbody th{
-      white-space:normal;
-    }
+    .matrix-table tbody th{white-space:normal;}
     .center{
       text-align:center;
       vertical-align:middle;
@@ -255,21 +256,65 @@
       width:14px;
       height:14px;
       border-radius:999px;
-      background: var(--dot);
-      border:1px solid var(--dot-border);
+      background: rgba(234,240,255,.92);
+      border:1px solid rgba(255,255,255,.22);
       box-shadow: 0 6px 16px rgba(0,0,0,.25);
     }
     .dot.partial{
-      background:
-        linear-gradient(90deg, var(--dot-partial) 50%, rgba(255,255,255,0) 50%);
-      border:1px solid rgba(255,255,255,.22);
+      background: linear-gradient(90deg, rgba(124,92,255,.95) 50%, rgba(234,240,255,.15) 50%);
     }
 
-    /* Minimal motion */
+    /* Drag and drop affordances */
+    .dropzone{
+      outline:2px solid transparent;
+      outline-offset:4px;
+      border-radius:12px;
+      transition: outline-color .12s ease, background .12s ease;
+    }
+    .dropzone.is-over{
+      outline-color: var(--focus);
+      background: rgba(124,92,255,.08);
+    }
+    .pill.dragging{
+      opacity:.55;
+      transform:none;
+    }
+
+    /* Remove button on placed chips */
+    .remove-btn{
+      position:absolute;
+      top:6px;
+      right:6px;
+      width:18px;
+      height:18px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.08);
+      color: rgba(234,240,255,.85);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-size:12px;
+      line-height:1;
+      cursor:pointer;
+      opacity:.0;
+      transition: opacity .12s ease, background .12s ease, border-color .12s ease;
+    }
+    .pill:hover .remove-btn{
+      opacity:1;
+    }
+    .remove-btn:hover{
+      background: rgba(255,77,109,.18);
+      border-color: rgba(255,77,109,.35);
+      color: rgba(255,255,255,.95);
+    }
+
     @media (prefers-reduced-motion: reduce){
       .card{animation:none;}
       .pill{transition:none;}
       .pill:hover{transform:none;}
+      .dropzone{transition:none;}
+      .remove-btn{transition:none;}
     }
 
     @media (max-width:980px){
@@ -311,86 +356,122 @@
         <tbody>
           <tr>
             <th>Week 1</th>
-            <td><div class="slot"></div></td>
+            <td><div class="slot dropzone"></div></td>
             <td>
-              <div class="slot">
-                <div class="pill"><span class="code c-su">SU</span><span class="name">Standup</span></div>
+              <div class="slot dropzone">
+                <div class="pill" draggable="true" data-meeting="SU">
+                  <span class="code c-su">SU</span><span class="name">Standup</span>
+                </div>
               </div>
             </td>
-            <td><div class="slot"></div></td>
+            <td><div class="slot dropzone"></div></td>
             <td>
-              <div class="slot">
-                <div class="pill"><span class="code c-ret">RET</span><span class="name">Retrospective</span></div>
-                <div class="pill"><span class="code c-sg">SG</span><span class="name">Sprint Grooming</span></div>
-                <div class="pill"><span class="code c-su">SU</span><span class="name">Standup</span></div>
+              <div class="slot dropzone">
+                <div class="pill" draggable="true" data-meeting="RET">
+                  <span class="code c-ret">RET</span><span class="name">Retrospective</span>
+                </div>
+                <div class="pill" draggable="true" data-meeting="SG">
+                  <span class="code c-sg">SG</span><span class="name">Sprint Grooming</span>
+                </div>
+                <div class="pill" draggable="true" data-meeting="SU">
+                  <span class="code c-su">SU</span><span class="name">Standup</span>
+                </div>
               </div>
             </td>
-            <td><div class="slot"></div></td>
+            <td><div class="slot dropzone"></div></td>
           </tr>
 
           <tr>
             <th>Week 2</th>
             <td>
-              <div class="slot">
-                <div class="pill"><span class="code c-sko">SKO</span><span class="name">Sprint Kickoff</span></div>
+              <div class="slot dropzone">
+                <div class="pill" draggable="true" data-meeting="SKO">
+                  <span class="code c-sko">SKO</span><span class="name">Sprint Kickoff</span>
+                </div>
               </div>
             </td>
             <td>
-              <div class="slot">
-                <div class="pill"><span class="code c-psp">PSP</span><span class="name">Pre-Sprint Planning</span></div>
-                <div class="pill"><span class="code c-su">SU</span><span class="name">Standup</span></div>
-                <div class="pill"><span class="code c-bws">BWS</span><span class="name">Brand Web Sync</span></div>
+              <div class="slot dropzone">
+                <div class="pill" draggable="true" data-meeting="PSP">
+                  <span class="code c-psp">PSP</span><span class="name">Pre-Sprint Planning</span>
+                </div>
+                <div class="pill" draggable="true" data-meeting="SU">
+                  <span class="code c-su">SU</span><span class="name">Standup</span>
+                </div>
+                <div class="pill" draggable="true" data-meeting="BWS">
+                  <span class="code c-bws">BWS</span><span class="name">Brand Web Sync</span>
+                </div>
               </div>
             </td>
-            <td><div class="slot"></div></td>
+            <td><div class="slot dropzone"></div></td>
             <td>
-              <div class="slot">
-                <div class="pill"><span class="code c-su">SU</span><span class="name">Standup</span></div>
+              <div class="slot dropzone">
+                <div class="pill" draggable="true" data-meeting="SU">
+                  <span class="code c-su">SU</span><span class="name">Standup</span>
+                </div>
               </div>
             </td>
-            <td><div class="slot"></div></td>
+            <td><div class="slot dropzone"></div></td>
           </tr>
 
           <tr>
             <th>Week 3</th>
-            <td><div class="slot"></div></td>
+            <td><div class="slot dropzone"></div></td>
             <td>
-              <div class="slot">
-                <div class="pill"><span class="code c-su">SU</span><span class="name">Standup</span></div>
+              <div class="slot dropzone">
+                <div class="pill" draggable="true" data-meeting="SU">
+                  <span class="code c-su">SU</span><span class="name">Standup</span>
+                </div>
               </div>
             </td>
-            <td><div class="slot"></div></td>
+            <td><div class="slot dropzone"></div></td>
             <td>
-              <div class="slot">
-                <div class="pill"><span class="code c-ret">RET</span><span class="name">Retrospective</span></div>
-                <div class="pill"><span class="code c-sg">SG</span><span class="name">Sprint Grooming</span></div>
-                <div class="pill"><span class="code c-su">SU</span><span class="name">Standup</span></div>
+              <div class="slot dropzone">
+                <div class="pill" draggable="true" data-meeting="RET">
+                  <span class="code c-ret">RET</span><span class="name">Retrospective</span>
+                </div>
+                <div class="pill" draggable="true" data-meeting="SG">
+                  <span class="code c-sg">SG</span><span class="name">Sprint Grooming</span>
+                </div>
+                <div class="pill" draggable="true" data-meeting="SU">
+                  <span class="code c-su">SU</span><span class="name">Standup</span>
+                </div>
               </div>
             </td>
-            <td><div class="slot"></div></td>
+            <td><div class="slot dropzone"></div></td>
           </tr>
 
           <tr>
             <th>Week 4</th>
             <td>
-              <div class="slot">
-                <div class="pill"><span class="code c-sko">SKO</span><span class="name">Sprint Kickoff</span></div>
+              <div class="slot dropzone">
+                <div class="pill" draggable="true" data-meeting="SKO">
+                  <span class="code c-sko">SKO</span><span class="name">Sprint Kickoff</span>
+                </div>
               </div>
             </td>
             <td>
-              <div class="slot">
-                <div class="pill"><span class="code c-psp">PSP</span><span class="name">Pre-Sprint Planning</span></div>
-                <div class="pill"><span class="code c-su">SU</span><span class="name">Standup</span></div>
-                <div class="pill"><span class="code c-bws">BWS</span><span class="name">Brand Web Sync</span></div>
+              <div class="slot dropzone">
+                <div class="pill" draggable="true" data-meeting="PSP">
+                  <span class="code c-psp">PSP</span><span class="name">Pre-Sprint Planning</span>
+                </div>
+                <div class="pill" draggable="true" data-meeting="SU">
+                  <span class="code c-su">SU</span><span class="name">Standup</span>
+                </div>
+                <div class="pill" draggable="true" data-meeting="BWS">
+                  <span class="code c-bws">BWS</span><span class="name">Brand Web Sync</span>
+                </div>
               </div>
             </td>
-            <td><div class="slot"></div></td>
+            <td><div class="slot dropzone"></div></td>
             <td>
-              <div class="slot">
-                <div class="pill"><span class="code c-su">SU</span><span class="name">Standup</span></div>
+              <div class="slot dropzone">
+                <div class="pill" draggable="true" data-meeting="SU">
+                  <span class="code c-su">SU</span><span class="name">Standup</span>
+                </div>
               </div>
             </td>
-            <td><div class="slot"></div></td>
+            <td><div class="slot dropzone"></div></td>
           </tr>
         </tbody>
       </table>
@@ -400,18 +481,18 @@
       <div class="meetings-wrap">
         <div class="section-title">Regular meetings</div>
         <div class="legend-grid" aria-label="Regular meetings">
-          <div class="pill"><span class="code c-sko">SKO</span><span class="name">Sprint Kickoff</span></div>
-          <div class="pill"><span class="code c-su">SU</span><span class="name">Standup</span></div>
-          <div class="pill"><span class="code c-psp">PSP</span><span class="name">Pre-Sprint Planning</span></div>
-          <div class="pill"><span class="code c-bws">BWS</span><span class="name">Brand Web Sync</span></div>
-          <div class="pill"><span class="code c-sg">SG</span><span class="name">Sprint Grooming</span></div>
-          <div class="pill"><span class="code c-ret">RET</span><span class="name">Retrospective</span></div>
+          <div class="pill" draggable="true" data-template="1" data-meeting="SKO"><span class="code c-sko">SKO</span><span class="name">Sprint Kickoff</span></div>
+          <div class="pill" draggable="true" data-template="1" data-meeting="SU"><span class="code c-su">SU</span><span class="name">Standup</span></div>
+          <div class="pill" draggable="true" data-template="1" data-meeting="PSP"><span class="code c-psp">PSP</span><span class="name">Pre-Sprint Planning</span></div>
+          <div class="pill" draggable="true" data-template="1" data-meeting="BWS"><span class="code c-bws">BWS</span><span class="name">Brand Web Sync</span></div>
+          <div class="pill" draggable="true" data-template="1" data-meeting="SG"><span class="code c-sg">SG</span><span class="name">Sprint Grooming</span></div>
+          <div class="pill" draggable="true" data-template="1" data-meeting="RET"><span class="code c-ret">RET</span><span class="name">Retrospective</span></div>
         </div>
 
         <div class="section-title" style="margin-top:14px;">Ad-hoc meetings</div>
         <div class="legend-grid" aria-label="Ad-hoc meetings">
-          <div class="pill"><span class="code c-sz">SZ</span><span class="name">Sizing</span></div>
-          <div class="pill"><span class="code c-dho">DHO</span><span class="name">Design Handoff</span></div>
+          <div class="pill" draggable="true" data-template="1" data-meeting="SZ"><span class="code c-sz">SZ</span><span class="name">Sizing</span></div>
+          <div class="pill" draggable="true" data-template="1" data-meeting="DHO"><span class="code c-dho">DHO</span><span class="name">Design Handoff</span></div>
         </div>
       </div>
 
@@ -522,5 +603,125 @@
 
     </div>
   </div>
+
+  <script>
+    (function(){
+      const dropzones = Array.from(document.querySelectorAll('.dropzone'));
+      let dragged = null;
+      let draggedFromTemplate = false;
+
+      function ensureRemoveButton(pill){
+        if (pill.dataset.template === "1") return;
+        if (pill.querySelector('.remove-btn')) return;
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'remove-btn';
+        btn.setAttribute('aria-label', 'Remove');
+        btn.textContent = '×';
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          pill.remove();
+        });
+        pill.appendChild(btn);
+      }
+
+      function makeDraggable(pill){
+        pill.setAttribute('draggable', 'true');
+
+        pill.addEventListener('dragstart', (e) => {
+          dragged = pill;
+          draggedFromTemplate = pill.dataset.template === "1";
+          pill.classList.add('dragging');
+
+          // Identify the meeting type so we can recreate clones reliably
+          e.dataTransfer.setData('text/plain', pill.dataset.meeting || '');
+          e.dataTransfer.effectAllowed = draggedFromTemplate ? 'copy' : 'move';
+        });
+
+        pill.addEventListener('dragend', () => {
+          pill.classList.remove('dragging');
+          dropzones.forEach(z => z.classList.remove('is-over'));
+          dragged = null;
+          draggedFromTemplate = false;
+        });
+
+        // Only placed chips can be removed
+        ensureRemoveButton(pill);
+      }
+
+      function cloneFromTemplate(templatePill){
+        const clone = templatePill.cloneNode(true);
+        delete clone.dataset.template;
+        clone.removeAttribute('data-template');
+        clone.classList.remove('dragging');
+        // Remove any existing remove button from cloneNode (should not exist, but safe)
+        const rb = clone.querySelector('.remove-btn');
+        if (rb) rb.remove();
+        makeDraggable(clone);
+        ensureRemoveButton(clone);
+        return clone;
+      }
+
+      function getDragAfterElement(container, y){
+        const items = [...container.querySelectorAll('.pill:not(.dragging)')];
+        return items.reduce((closest, child) => {
+          const box = child.getBoundingClientRect();
+          const offset = y - box.top - box.height / 2;
+          if (offset < 0 && offset > closest.offset){
+            return { offset, element: child };
+          }
+          return closest;
+        }, { offset: Number.NEGATIVE_INFINITY, element: null }).element;
+      }
+
+      // Init: make all pills draggable and removable (calendar pills too)
+      document.querySelectorAll('.pill').forEach(makeDraggable);
+
+      // Dropzone behavior
+      dropzones.forEach(zone => {
+        zone.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          zone.classList.add('is-over');
+
+          const afterEl = getDragAfterElement(zone, e.clientY);
+          const draggingEl = document.querySelector('.pill.dragging');
+          if (!draggingEl) return;
+
+          // If dragging from template, we do not move the template around
+          if (draggedFromTemplate) return;
+
+          if (afterEl == null){
+            zone.appendChild(draggingEl);
+          } else {
+            zone.insertBefore(draggingEl, afterEl);
+          }
+        });
+
+        zone.addEventListener('dragleave', () => zone.classList.remove('is-over'));
+
+        zone.addEventListener('drop', (e) => {
+          e.preventDefault();
+          zone.classList.remove('is-over');
+
+          if (!dragged) return;
+
+          // Copy behavior: templates always clone, placed pills move
+          if (draggedFromTemplate){
+            const copy = cloneFromTemplate(dragged);
+            const afterEl = getDragAfterElement(zone, e.clientY);
+            if (afterEl == null){
+              zone.appendChild(copy);
+            } else {
+              zone.insertBefore(copy, afterEl);
+            }
+          } else {
+            // Ensure the moved pill still has its remove button
+            ensureRemoveButton(dragged);
+          }
+        });
+      });
+    })();
+  </script>
 </body>
 </html>
