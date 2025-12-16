@@ -29,6 +29,11 @@
       --ret:#FF4D6D;
       --sz:#7C5CFF;  /* new */
       --dho:#B56CFF;
+
+      /* Participation dots */
+      --dot: rgba(234,240,255,.92);
+      --dot-border: rgba(255,255,255,.22);
+      --dot-partial: #7C5CFF; /* partial participation accent */
     }
 
     *{box-sizing:border-box}
@@ -176,7 +181,7 @@
       flex:0 0 auto;
     }
 
-    /* Two-line clamp to avoid overflow while staying readable */
+    /* Two-line clamp */
     .name{
       color:var(--text);
       font-weight:650;
@@ -217,9 +222,7 @@
       padding-left:12px;
     }
 
-    .legend-grid .pill{
-      width:100%;
-    }
+    .legend-grid .pill{width:100%;}
 
     /* Description table */
     .desc-table col:nth-child(1){width:34%;}
@@ -230,11 +233,36 @@
       border-right:1px solid var(--grid);
     }
     .desc-table td:last-child{border-right:none;}
-    .desc-table tbody th{
-      background: rgba(17,28,58,.20);
+    .desc-table tbody th{background: rgba(17,28,58,.20);}
+    .desc-table thead th{text-align:left;}
+
+    /* Participation matrix */
+    .matrix-table thead th{
+      text-align:center;
+      white-space:nowrap;
     }
-    .desc-table thead th{
-      text-align:left;
+    .matrix-table tbody th{
+      white-space:normal;
+    }
+    .center{
+      text-align:center;
+      vertical-align:middle;
+      padding:12px;
+      height:auto;
+    }
+    .dot{
+      display:inline-block;
+      width:14px;
+      height:14px;
+      border-radius:999px;
+      background: var(--dot);
+      border:1px solid var(--dot-border);
+      box-shadow: 0 6px 16px rgba(0,0,0,.25);
+    }
+    .dot.partial{
+      background:
+        linear-gradient(90deg, var(--dot-partial) 50%, rgba(255,255,255,0) 50%);
+      border:1px solid rgba(255,255,255,.22);
     }
 
     /* Minimal motion */
@@ -252,6 +280,7 @@
     @media (max-width:520px){
       .legend-grid{grid-template-columns:1fr;}
       .name{font-size:12px;}
+      .matrix-table thead th{font-size:12px;}
     }
   </style>
 </head>
@@ -398,37 +427,95 @@
           </tr>
         </thead>
         <tbody>
+          <tr><th>Standup</th><td>Confirm execution status, surface blockers, and align on immediate next steps.</td></tr>
+          <tr><th>Pre-Sprint Planning</th><td>Shape the candidate sprint based on priorities, capacity, and delivery constraints.</td></tr>
+          <tr><th>Sprint Kickoff</th><td>Align on sprint goals, scope, and ownership to start execution with clarity.</td></tr>
+          <tr><th>Sprint Grooming</th><td>Refine upcoming backlog items to ensure clarity, feasibility, and readiness.</td></tr>
+          <tr><th>Retrospective</th><td>Review outcomes and agree on focused improvements to increase team effectiveness.</td></tr>
+          <tr><th>Brand Web Sync</th><td>Maintain design and engineering alignment on upcoming work and implementation considerations.</td></tr>
+          <tr><th>Sizing</th><td>Assess scope and complexity early to reduce uncertainty before committing to work.</td></tr>
+          <tr><th>Design Handoff</th><td>Transfer implementation-ready design decisions and context to enable smooth development.</td></tr>
+        </tbody>
+      </table>
+
+      <div class="divider"></div>
+
+      <div class="section-title">Participation by team</div>
+      <table class="matrix-table" aria-label="Participation matrix">
+        <thead>
+          <tr>
+            <th style="text-align:left;">Meeting</th>
+            <th>Tec Leads</th>
+            <th>Engineering</th>
+            <th>UX Design</th>
+            <th>Management</th>
+            <th>Content Author</th>
+          </tr>
+        </thead>
+        <tbody>
           <tr>
             <th>Standup</th>
-            <td>Confirm execution status, surface blockers, and align on immediate next steps.</td>
+            <td class="center"><span class="dot"></span></td>
+            <td class="center"><span class="dot"></span></td>
+            <td class="center"></td>
+            <td class="center"><span class="dot"></span></td>
+            <td class="center"><span class="dot"></span></td>
           </tr>
           <tr>
             <th>Pre-Sprint Planning</th>
-            <td>Shape the candidate sprint based on priorities, capacity, and delivery constraints.</td>
+            <td class="center"><span class="dot"></span></td>
+            <td class="center"></td>
+            <td class="center"></td>
+            <td class="center"><span class="dot"></span></td>
+            <td class="center"><span class="dot"></span></td>
           </tr>
           <tr>
             <th>Sprint Kickoff</th>
-            <td>Align on sprint goals, scope, and ownership to start execution with clarity.</td>
+            <td class="center"><span class="dot"></span></td>
+            <td class="center"><span class="dot"></span></td>
+            <td class="center"></td>
+            <td class="center"><span class="dot"></span></td>
+            <td class="center"><span class="dot"></span></td>
           </tr>
           <tr>
             <th>Sprint Grooming</th>
-            <td>Refine upcoming backlog items to ensure clarity, feasibility, and readiness.</td>
+            <td class="center"><span class="dot"></span></td>
+            <td class="center"><span class="dot"></span></td>
+            <td class="center"></td>
+            <td class="center"><span class="dot"></span></td>
+            <td class="center"><span class="dot"></span></td>
           </tr>
           <tr>
             <th>Retrospective</th>
-            <td>Review outcomes and agree on focused improvements to increase team effectiveness.</td>
+            <td class="center"><span class="dot"></span></td>
+            <td class="center"><span class="dot"></span></td>
+            <td class="center"></td>
+            <td class="center"><span class="dot"></span></td>
+            <td class="center"><span class="dot"></span></td>
           </tr>
           <tr>
             <th>Brand Web Sync</th>
-            <td>Maintain design and engineering alignment on upcoming work and implementation considerations.</td>
+            <td class="center"><span class="dot"></span></td>
+            <td class="center"><span class="dot partial" title="Only required engineers"></span></td>
+            <td class="center"><span class="dot"></span></td>
+            <td class="center"><span class="dot"></span></td>
+            <td class="center"><span class="dot"></span></td>
           </tr>
           <tr>
             <th>Sizing</th>
-            <td>Assess scope and complexity early to reduce uncertainty before committing to work.</td>
+            <td class="center"><span class="dot"></span></td>
+            <td class="center"><span class="dot partial" title="Only required engineers"></span></td>
+            <td class="center"><span class="dot"></span></td>
+            <td class="center"><span class="dot"></span></td>
+            <td class="center"><span class="dot"></span></td>
           </tr>
           <tr>
             <th>Design Handoff</th>
-            <td>Transfer implementation-ready design decisions and context to enable smooth development.</td>
+            <td class="center"><span class="dot"></span></td>
+            <td class="center"><span class="dot partial" title="Only required engineers"></span></td>
+            <td class="center"><span class="dot"></span></td>
+            <td class="center"><span class="dot"></span></td>
+            <td class="center"><span class="dot"></span></td>
           </tr>
         </tbody>
       </table>
