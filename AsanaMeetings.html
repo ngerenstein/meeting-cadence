@@ -19,7 +19,6 @@
       --pill-bg: rgba(255,255,255,.07);
       --pill-border: rgba(255,255,255,.16);
 
-      /* Asana-ish accents */
       --sko:#00C2A8;
       --su:#4573FF;
       --psp:#FFB020;
@@ -138,6 +137,18 @@
       min-height:92px;
     }
 
+    /* Dropzones */
+    .dropzone{
+      outline:2px solid transparent;
+      outline-offset:4px;
+      border-radius:12px;
+      transition: outline-color .12s ease, background .12s ease;
+    }
+    .dropzone.is-over{
+      outline-color: var(--focus);
+      background: rgba(124,92,255,.08);
+    }
+
     /* Pills */
     .pill{
       display:flex;
@@ -149,22 +160,36 @@
       background: var(--pill-bg);
       max-width:100%;
       min-width:0;
+
       cursor:grab;
       user-select:none;
+      -webkit-user-select:none;
+      -moz-user-select:none;
+      -ms-user-select:none;
+      -webkit-user-drag: element;
+
       transition: transform .12s ease, border-color .12s ease, background .12s ease;
       position:relative;
     }
-    .pill:active{cursor:grabbing;}
 
-    .slot .pill{
-      width:100%;
-      max-width:100%;
+    .pill *{
+      user-select:none;
+      -webkit-user-select:none;
+      -webkit-user-drag:none;
     }
+
+    .pill:active{cursor:grabbing;}
+    .slot .pill{width:100%; max-width:100%;}
 
     .pill:hover{
       transform: translateY(-1px);
       border-color: rgba(255,255,255,.22);
       background: rgba(255,255,255,.09);
+    }
+
+    .pill.dragging{
+      opacity:.55;
+      transform:none;
     }
 
     .code{
@@ -182,7 +207,6 @@
       line-height:1;
     }
 
-    /* Two-line clamp */
     .name{
       color:var(--text);
       font-weight:650;
@@ -196,7 +220,7 @@
       -webkit-line-clamp:2;
       white-space:normal;
       line-height:1.15;
-      padding-right:18px; /* space for remove button */
+      padding-right:18px;
     }
 
     /* Colors */
@@ -208,6 +232,34 @@
     .c-ret{background:var(--ret);}
     .c-sz{background:var(--sz);}
     .c-dho{background:var(--dho);}
+
+    /* Remove button (only on placed copies) */
+    .remove-btn{
+      position:absolute;
+      top:6px;
+      right:6px;
+      width:18px;
+      height:18px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.08);
+      color: rgba(234,240,255,.85);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-size:12px;
+      line-height:1;
+      cursor:pointer;
+      opacity:0;
+      transition: opacity .12s ease, background .12s ease, border-color .12s ease;
+      pointer-events:auto;
+    }
+    .pill:hover .remove-btn{opacity:1;}
+    .remove-btn:hover{
+      background: rgba(255,77,109,.18);
+      border-color: rgba(255,77,109,.35);
+      color: rgba(255,255,255,.95);
+    }
 
     /* Meetings containers */
     .meetings-wrap{
@@ -224,8 +276,6 @@
       padding-left:12px;
     }
     .legend-grid .pill{width:100%;}
-    .legend-grid .slot{min-height:auto;}
-    .legend-grid .pill{cursor:grab;}
 
     /* Description table */
     .desc-table col:nth-child(1){width:34%;}
@@ -245,12 +295,7 @@
       white-space:nowrap;
     }
     .matrix-table tbody th{white-space:normal;}
-    .center{
-      text-align:center;
-      vertical-align:middle;
-      padding:12px;
-      height:auto;
-    }
+    .center{ text-align:center; vertical-align:middle; padding:12px; height:auto; }
     .dot{
       display:inline-block;
       width:14px;
@@ -262,51 +307,6 @@
     }
     .dot.partial{
       background: linear-gradient(90deg, rgba(124,92,255,.95) 50%, rgba(234,240,255,.15) 50%);
-    }
-
-    /* Drag and drop affordances */
-    .dropzone{
-      outline:2px solid transparent;
-      outline-offset:4px;
-      border-radius:12px;
-      transition: outline-color .12s ease, background .12s ease;
-    }
-    .dropzone.is-over{
-      outline-color: var(--focus);
-      background: rgba(124,92,255,.08);
-    }
-    .pill.dragging{
-      opacity:.55;
-      transform:none;
-    }
-
-    /* Remove button on placed chips */
-    .remove-btn{
-      position:absolute;
-      top:6px;
-      right:6px;
-      width:18px;
-      height:18px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.18);
-      background: rgba(255,255,255,.08);
-      color: rgba(234,240,255,.85);
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      font-size:12px;
-      line-height:1;
-      cursor:pointer;
-      opacity:.0;
-      transition: opacity .12s ease, background .12s ease, border-color .12s ease;
-    }
-    .pill:hover .remove-btn{
-      opacity:1;
-    }
-    .remove-btn:hover{
-      background: rgba(255,77,109,.18);
-      border-color: rgba(255,77,109,.35);
-      color: rgba(255,255,255,.95);
     }
 
     @media (prefers-reduced-motion: reduce){
@@ -356,17 +356,17 @@
         <tbody>
           <tr>
             <th>Week 1</th>
-            <td><div class="slot dropzone"></div></td>
-            <td>
-              <div class="slot dropzone">
+            <td class="dropzone"><div class="slot"></div></td>
+            <td class="dropzone">
+              <div class="slot">
                 <div class="pill" draggable="true" data-meeting="SU">
                   <span class="code c-su">SU</span><span class="name">Standup</span>
                 </div>
               </div>
             </td>
-            <td><div class="slot dropzone"></div></td>
-            <td>
-              <div class="slot dropzone">
+            <td class="dropzone"><div class="slot"></div></td>
+            <td class="dropzone">
+              <div class="slot">
                 <div class="pill" draggable="true" data-meeting="RET">
                   <span class="code c-ret">RET</span><span class="name">Retrospective</span>
                 </div>
@@ -378,20 +378,20 @@
                 </div>
               </div>
             </td>
-            <td><div class="slot dropzone"></div></td>
+            <td class="dropzone"><div class="slot"></div></td>
           </tr>
 
           <tr>
             <th>Week 2</th>
-            <td>
-              <div class="slot dropzone">
+            <td class="dropzone">
+              <div class="slot">
                 <div class="pill" draggable="true" data-meeting="SKO">
                   <span class="code c-sko">SKO</span><span class="name">Sprint Kickoff</span>
                 </div>
               </div>
             </td>
-            <td>
-              <div class="slot dropzone">
+            <td class="dropzone">
+              <div class="slot">
                 <div class="pill" draggable="true" data-meeting="PSP">
                   <span class="code c-psp">PSP</span><span class="name">Pre-Sprint Planning</span>
                 </div>
@@ -403,30 +403,30 @@
                 </div>
               </div>
             </td>
-            <td><div class="slot dropzone"></div></td>
-            <td>
-              <div class="slot dropzone">
+            <td class="dropzone"><div class="slot"></div></td>
+            <td class="dropzone">
+              <div class="slot">
                 <div class="pill" draggable="true" data-meeting="SU">
                   <span class="code c-su">SU</span><span class="name">Standup</span>
                 </div>
               </div>
             </td>
-            <td><div class="slot dropzone"></div></td>
+            <td class="dropzone"><div class="slot"></div></td>
           </tr>
 
           <tr>
             <th>Week 3</th>
-            <td><div class="slot dropzone"></div></td>
-            <td>
-              <div class="slot dropzone">
+            <td class="dropzone"><div class="slot"></div></td>
+            <td class="dropzone">
+              <div class="slot">
                 <div class="pill" draggable="true" data-meeting="SU">
                   <span class="code c-su">SU</span><span class="name">Standup</span>
                 </div>
               </div>
             </td>
-            <td><div class="slot dropzone"></div></td>
-            <td>
-              <div class="slot dropzone">
+            <td class="dropzone"><div class="slot"></div></td>
+            <td class="dropzone">
+              <div class="slot">
                 <div class="pill" draggable="true" data-meeting="RET">
                   <span class="code c-ret">RET</span><span class="name">Retrospective</span>
                 </div>
@@ -438,20 +438,20 @@
                 </div>
               </div>
             </td>
-            <td><div class="slot dropzone"></div></td>
+            <td class="dropzone"><div class="slot"></div></td>
           </tr>
 
           <tr>
             <th>Week 4</th>
-            <td>
-              <div class="slot dropzone">
+            <td class="dropzone">
+              <div class="slot">
                 <div class="pill" draggable="true" data-meeting="SKO">
                   <span class="code c-sko">SKO</span><span class="name">Sprint Kickoff</span>
                 </div>
               </div>
             </td>
-            <td>
-              <div class="slot dropzone">
+            <td class="dropzone">
+              <div class="slot">
                 <div class="pill" draggable="true" data-meeting="PSP">
                   <span class="code c-psp">PSP</span><span class="name">Pre-Sprint Planning</span>
                 </div>
@@ -463,15 +463,15 @@
                 </div>
               </div>
             </td>
-            <td><div class="slot dropzone"></div></td>
-            <td>
-              <div class="slot dropzone">
+            <td class="dropzone"><div class="slot"></div></td>
+            <td class="dropzone">
+              <div class="slot">
                 <div class="pill" draggable="true" data-meeting="SU">
                   <span class="code c-su">SU</span><span class="name">Standup</span>
                 </div>
               </div>
             </td>
-            <td><div class="slot dropzone"></div></td>
+            <td class="dropzone"><div class="slot"></div></td>
           </tr>
         </tbody>
       </table>
@@ -606,11 +606,11 @@
 
   <script>
     (function(){
-      const dropzones = Array.from(document.querySelectorAll('.dropzone'));
-      let dragged = null;
-      let draggedFromTemplate = false;
+      const dropzones = Array.from(document.querySelectorAll('td.dropzone'));
+      let draggedEl = null;
+      let fromTemplate = false;
 
-      function ensureRemoveButton(pill){
+      function addRemoveButton(pill){
         if (pill.dataset.template === "1") return;
         if (pill.querySelector('.remove-btn')) return;
 
@@ -620,6 +620,7 @@
         btn.setAttribute('aria-label', 'Remove');
         btn.textContent = '×';
         btn.addEventListener('click', (e) => {
+          e.preventDefault();
           e.stopPropagation();
           pill.remove();
         });
@@ -627,40 +628,45 @@
       }
 
       function makeDraggable(pill){
-        pill.setAttribute('draggable', 'true');
+        pill.setAttribute('draggable','true');
 
         pill.addEventListener('dragstart', (e) => {
-          dragged = pill;
-          draggedFromTemplate = pill.dataset.template === "1";
+          draggedEl = pill;
+          fromTemplate = pill.dataset.template === "1";
           pill.classList.add('dragging');
 
-          // Identify the meeting type so we can recreate clones reliably
-          e.dataTransfer.setData('text/plain', pill.dataset.meeting || '');
-          e.dataTransfer.effectAllowed = draggedFromTemplate ? 'copy' : 'move';
+          // MUST set non-empty data for consistent HTML5 DnD behavior
+          const key = pill.dataset.meeting || 'MEETING';
+          e.dataTransfer.setData('text/plain', key);
+          e.dataTransfer.effectAllowed = fromTemplate ? 'copy' : 'move';
         });
 
         pill.addEventListener('dragend', () => {
           pill.classList.remove('dragging');
           dropzones.forEach(z => z.classList.remove('is-over'));
-          dragged = null;
-          draggedFromTemplate = false;
+          draggedEl = null;
+          fromTemplate = false;
         });
 
-        // Only placed chips can be removed
-        ensureRemoveButton(pill);
+        addRemoveButton(pill);
       }
 
-      function cloneFromTemplate(templatePill){
+      function cloneTemplate(templatePill){
         const clone = templatePill.cloneNode(true);
-        delete clone.dataset.template;
         clone.removeAttribute('data-template');
-        clone.classList.remove('dragging');
-        // Remove any existing remove button from cloneNode (should not exist, but safe)
+        delete clone.dataset.template;
+
+        // safety: remove any existing remove button
         const rb = clone.querySelector('.remove-btn');
         if (rb) rb.remove();
+
         makeDraggable(clone);
-        ensureRemoveButton(clone);
+        addRemoveButton(clone);
         return clone;
+      }
+
+      function getSlot(td){
+        return td.querySelector('.slot');
       }
 
       function getDragAfterElement(container, y){
@@ -675,49 +681,55 @@
         }, { offset: Number.NEGATIVE_INFINITY, element: null }).element;
       }
 
-      // Init: make all pills draggable and removable (calendar pills too)
+      // Init draggables
       document.querySelectorAll('.pill').forEach(makeDraggable);
 
-      // Dropzone behavior
-      dropzones.forEach(zone => {
-        zone.addEventListener('dragover', (e) => {
+      // Dropzones
+      dropzones.forEach(td => {
+        td.addEventListener('dragenter', (e) => {
           e.preventDefault();
-          zone.classList.add('is-over');
+          td.classList.add('is-over');
+        });
 
-          const afterEl = getDragAfterElement(zone, e.clientY);
-          const draggingEl = document.querySelector('.pill.dragging');
-          if (!draggingEl) return;
+        td.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          td.classList.add('is-over');
 
-          // If dragging from template, we do not move the template around
-          if (draggedFromTemplate) return;
+          // Manual sort only for already placed chips (move)
+          if (!draggedEl || fromTemplate) return;
 
+          const slot = getSlot(td);
+          const afterEl = getDragAfterElement(slot, e.clientY);
           if (afterEl == null){
-            zone.appendChild(draggingEl);
+            slot.appendChild(draggedEl);
           } else {
-            zone.insertBefore(draggingEl, afterEl);
+            slot.insertBefore(draggedEl, afterEl);
           }
         });
 
-        zone.addEventListener('dragleave', () => zone.classList.remove('is-over'));
+        td.addEventListener('dragleave', (e) => {
+          if (!td.contains(e.relatedTarget)) td.classList.remove('is-over');
+        });
 
-        zone.addEventListener('drop', (e) => {
+        td.addEventListener('drop', (e) => {
           e.preventDefault();
-          zone.classList.remove('is-over');
+          td.classList.remove('is-over');
 
-          if (!dragged) return;
+          if (!draggedEl) return;
 
-          // Copy behavior: templates always clone, placed pills move
-          if (draggedFromTemplate){
-            const copy = cloneFromTemplate(dragged);
-            const afterEl = getDragAfterElement(zone, e.clientY);
+          const slot = getSlot(td);
+          const afterEl = getDragAfterElement(slot, e.clientY);
+
+          if (fromTemplate){
+            const copy = cloneTemplate(draggedEl);
             if (afterEl == null){
-              zone.appendChild(copy);
+              slot.appendChild(copy);
             } else {
-              zone.insertBefore(copy, afterEl);
+              slot.insertBefore(copy, afterEl);
             }
           } else {
-            // Ensure the moved pill still has its remove button
-            ensureRemoveButton(dragged);
+            // moved chip stays removable
+            addRemoveButton(draggedEl);
           }
         });
       });
